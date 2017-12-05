@@ -99,7 +99,7 @@ server.post('/patients', function (req, res, next) {
 server.put('/patients/:id', function (req, res, next) {
   // Ge patient updated data and create a new patient object
   let updatedPatient = getPatientData(req)
-  newPatupdatedPatientient._id = req.params.id
+  updatedPatient._id = req.params.id
   
   // Update the patient with the persistence engine
   patientsSave.update(updatedPatient, function (error, patient) {
@@ -125,6 +125,92 @@ server.del('/patients/:id', function (req, res, next) {
     res.send()
   })
 })
+//#endregion
+
+//#region CLINICAL DATA API
+// Get all clinical data for a specific patient in the system
+server.get('/patients/:id/records', function (req, res, next) {
+  
+    // Find every clinical data record that belongs to the pateint within the given collection
+    clinicalDataSave.find({PatientID: req.params.id}, function (error, records) {
+  
+    // Return all of the clinical data records for the patient
+    res.send(records)
+    })
+  })
+  
+  // Get a single clinical data record for a specific patient 
+  server.get('/patients/:patientId/records/:id', function (req, res, next) {
+  
+    // Find a single clinical data record from the save, based on recordId and patientId
+    clinicalDataSave.findOne({ _id: req.params.id, PatientID: req.params.patientId }, function (error, record) {
+  
+      // If there are any errors, pass them to next in the correct format
+      if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
+  
+      if (record) {
+        // Send the record if no issues
+        res.send(record)
+      } else {
+        // Send 404 header if the record doesn't exist
+        res.send(404)
+      }
+    })
+  })
+  
+  // Create a new clinical data record for a specific patient
+  server.post('/patients/:patientId/records', function (req, res, next) {
+    // Get new clinical data from the request object
+    let newRecord = ''
+    try {
+        newRecord = getClinicalData(req)
+    } catch (error) {
+        return next(new restify.InvalidArgumentError(JSON.stringify(error.message)))
+    }
+  
+    // Create the record using the persistence engine
+    clinicalDataSave.create( newRecord, function (error, record) {
+  
+      // If there are any errors, pass them to next in the correct format
+      if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
+  
+      // Send the record if no issues
+      res.send(201, record)
+    })
+  })
+  
+  // Update a specific patient's clinical data record by their id
+  server.put('/patients/:patientId/records/:id', function (req, res, next) {
+    // Ge patient updated data and create a new patient object
+    let updatedRecord = getClinicalData(req)
+    updatedRecord._id = req.params.id
+    updatedRecord.PatientID = req.params.patientId
+    
+    // Update the record with the persistence engine
+    clinicalDataSave.update(updatedRecord, function (error, record) {
+  
+      // If there are any errors, pass them to next in the correct format
+      if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
+  
+      // Send a 200 OK response
+      res.send(200)
+    })
+  })
+  
+  // Delete a specific patient's clinical data record by using both patient id and record id
+  server.del('/patients/:patientId/records/:id', function (req, res, next) {
+  
+    //TODO: Check delete logic. It seems we dont need the patientId
+    // Delete the record with the persistence engine
+    clinicalDataSave.delete(req.params.id, function (error, record) {
+  
+      // If there are any errors, pass them to next in the correct format
+      if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
+  
+      // Send a 200 OK response
+      res.send()
+    })
+  })
 //#endregion
 
 //#region  PRIVATE METHODS
@@ -198,6 +284,34 @@ function getEmergencyContactData(contactData){
 
   return newEmergencyContact;
 }
+
+
+function getClinicalData(req){
+  // Make sure Practitioner, DateTime, DataType and Reading are defined
+  if (req.params.Practitioner === undefined) {
+    throw new Error('Practitioner must be supplied')
+  }
+  if (req.params.DateTime === undefined) {
+    throw new Error('DateTime must be supplied')
+  }
+  if (req.params.DataType === undefined) {
+    throw new Error('DataType must be supplied')
+  }
+  if (req.params.Reading === undefined) {
+    throw new Error('Reading must be supplied')
+  }
+ 
+  let record = {
+		PatientID: req.params.patientId, 
+    Practitioner: req.params.Practitioner,
+    DateTime: req.params.DateTime,
+    DataType: req.params.DataType,
+    Reading: req.params.Reading
+  }
+
+  return record
+}
+
 //#endregion
 
 //#region JSON EXAMPLES 
