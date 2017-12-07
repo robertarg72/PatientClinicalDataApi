@@ -120,16 +120,30 @@ server.put('/patients/:id', function (req, res, next) {
 
 // Delete patient with the given id
 server.del('/patients/:id', function (req, res, next) {
+    // Find every clinical data record that belongs to this patient
+    clinicalDataSave.find({PatientID: req.params.id}, function (error, records) {
+       
+        // First Delete every clinical data record 
+        records.forEach(function(record, index){
 
-  // Delete the patient with the persistence engine
-  patientsSave.delete(req.params.id, function (error, patient) {
+            // Delete the record with the persistence engine
+            clinicalDataSave.delete(record._id, function (error, deletedRecord) {
+                // If there are any errors, pass them to next in the correct format
+                if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
+            })
+            console.log("All Clinical data for patientId=" + record.PatientID + " DELETED")
+        })
 
-    // If there are any errors, pass them to next in the correct format
-    if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
-
-    // Send a 200 OK response
-    res.send()
-  })
+        // Now Delete the patient with the persistence engine
+        patientsSave.delete(req.params.id, function (error, patient) {
+          // If there are any errors, pass them to next in the correct format
+          if (error) return next(new restify.InvalidArgumentError(JSON.stringify(error.errors)))
+      
+          // Send a 200 OK response
+          res.send()
+        })
+        
+    })
 })
 //#endregion
 
