@@ -61,6 +61,17 @@ server.get('/patients', function (req, res, next) {
   })
 })
 
+// Get all patients in critical condition in the system
+server.get('/patients/criticalCondition', function (req, res, next) {
+  
+    // Find every patient within the given collection
+    patientsSave.find({IsInCritcalCondition: true}, function (error, patients) {
+  
+      // Return all of the patients in the system
+      res.send(patients)
+    })
+  })
+
 // Get a single patient by their patient id
 server.get('/patients/:id', function (req, res, next) {
 
