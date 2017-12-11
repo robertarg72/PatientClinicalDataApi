@@ -15,7 +15,6 @@
   "author": "KAMALPREET SINGH, MEHMET FATIH INAN, ROBERT ARGUME",
   "license": "MIT",
   "dependencies": {
-    "path": "^0.12.7",
     "restify": "4.1.1",
     "save": "2.3.0"
   },
