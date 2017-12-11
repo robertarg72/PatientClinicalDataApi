@@ -12,8 +12,9 @@
  */
 
 let SERVER_NAME = 'patient-clinical-data-api'
-let PORT = 8000
-let HOST = '127.0.0.1'
+//let PORT = 8000
+let PORT = process.env.PORT || 8000
+//let HOST = '127.0.0.1'
 
 let restify = require('restify')
 
@@ -24,7 +25,8 @@ let restify = require('restify')
   // Create the restify server
   , server = restify.createServer({ name: SERVER_NAME})
 
-  server.listen(PORT, HOST, function () {
+//server.listen(PORT, HOST, function () {
+  server.listen(PORT, function () {
   console.log('Server %s listening at %s', server.name, server.url)
   console.log('Resources:')
   console.log(' /patients        method: GET')
@@ -47,6 +49,10 @@ server
   // Maps req.body to req.params so there is no switching between them
   .use(restify.bodyParser())
 
+// Catch all other routes and return a default message
+server.get('/', function (req, res, next) {
+  res.send('Patient RESTful API')
+});
 
 //#region PATIENT API
 
