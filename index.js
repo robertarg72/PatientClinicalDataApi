@@ -94,7 +94,7 @@ server.get('/patients/:id', function (req, res, next) {
 
     if (patient) {
       // Send the patient if no issues
-      res.send(user)
+      res.send(patient)
     } else {
       // Send 404 header if the patient doesn't exist
       res.send(404)
@@ -267,6 +267,9 @@ function getPatientData(req){
   if (req.params.DateOfBirth === undefined) {
     throw new Error('DateOfBirth must be supplied')
   }
+  if (req.params.Gender === undefined) {
+    throw new Error('Gender must be supplied')
+  }
   if (req.params.Telephone === undefined) {
     throw new Error('Telephone must be supplied')
   }
@@ -293,6 +296,7 @@ function getPatientData(req){
     LastName: req.params.LastName,
     Address: req.params.Address,
     DateOfBirth: req.params.DateOfBirth,
+    Gender: req.params.Gender,
     Telephone: req.params.Telephone,
     InsurancePlan: req.params.InsurancePlan,
     BloodType: req.params.BloodType,
@@ -329,9 +333,12 @@ function getEmergencyContactData(contactData){
 
 
 function getClinicalData(req){
-  // Make sure Practitioner, DateTime, DataType and Reading are defined
+  // Make sure Practitioner, Medical Center DateTime, DataType and Reading are defined
   if (req.params.Practitioner === undefined) {
     throw new Error('Practitioner must be supplied')
+  }
+  if (req.params.MedicalCenter === undefined) {
+    throw new Error('Medical Center must be supplied')
   }
   if (req.params.DateTime === undefined) {
     throw new Error('DateTime must be supplied')
@@ -346,6 +353,7 @@ function getClinicalData(req){
   let record = {
 		PatientID: req.params.patientId, 
     Practitioner: req.params.Practitioner,
+    MedicalCenter: req.params.MedicalCenter,
     DateTime: req.params.DateTime,
     DataType: req.params.DataType,
     Reading: req.params.Reading
@@ -363,6 +371,7 @@ let patientDataExample =
     "LastName": "Doe",
     "Address": "345 Yonge Street",
     "DateOfBirth": "11-27-2017",
+    "Gender": "female",
     "Telephone": "416-345-9033",
     "InsurancePlan": "BlueCross - 202",
         "EmergencyContact": {
@@ -379,6 +388,7 @@ let clinicalDataExample =
 {
     "PatientID": "567",
     "Practitioner": "Amanda Fox",
+    "MedicalCenter": "Maple Walk in Clinic",
     "DateTime": "10/10/2017 10:35 am",
     "DataType": "Temperature",
     "Reading": "37.2"
