@@ -14,7 +14,7 @@
 let SERVER_NAME = 'patient-clinical-data-api'
 
 // Port variable is prepared to work with Heroku. Also HOST variable commented to enable Heroky without problems
-let PORT = process.env.PORT || 8000
+let PORT = process.env.PORT || 5000
 //let HOST = '127.0.0.1'
 
 let restify = require('restify')
